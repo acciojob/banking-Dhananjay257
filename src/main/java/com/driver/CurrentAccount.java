@@ -1,98 +1,53 @@
 package com.driver;
 
+import java.util.Arrays;
+import java.util.HashMap;
+
 public class CurrentAccount extends BankAccount{
     String tradeLicenseId; //consists of Uppercase English characters only
 
     public CurrentAccount(String name, double balance, String tradeLicenseId) throws Exception {
         // minimum balance is 5000 by default. If balance is less than 5000, throw "Insufficient Balance" exception
         super(name,balance,5000);
-        this.tradeLicenseId = tradeLicenseId;
-        if(balance<5000)
-        {
-            throw new Exception("Insufficient Balance");
-        }
+        this.tradeLicenseId=tradeLicenseId;
     }
 
     public void validateLicenseId() throws Exception {
+        // A trade license Id is said to be valid if no two consecutive characters are same
+        if(isValid(tradeLicenseId)==false){
+            if (isAchiveable(tradeLicenseId)==true){
+
+            }else{
+                throw new Exception("Valid License can not be generated");
+            }
+        }
         // If the license Id is valid, do nothing
         // If the characters of the license Id can be rearranged to create any valid license Id
         // If it is not possible, throw "Valid License can not be generated" Exception
-        if(!isNumberValid(tradeLicenseId))
-        {
-            String rearranged = RearrangeString(tradeLicenseId);
-            if(rearranged==""){
-                throw new Exception("Valid License can not be generated");
-            }
-            else
-                this.tradeLicenseId = rearranged;
-        }
 
     }
-    public char getCountChar(int[] count)
-    {
-        int max =0;
-        char ch =0;
-        for(int i=0;i<26;i++)
-        {
-            if(count[i]>max)
-            {
-                max = count[i];
-                ch = (char)((int)'A'+i);
-            }
+    public boolean isValid(String id){
+        if(id.length()<=1) return false;
+        for(int i=1;i<id.length();i++){
+            if(id.charAt(i-1)==id.charAt(i)) return true;
         }
-        return ch;
+        return false;
     }
-    public String RearrangeString(String s)
-    {
-        int N = s.length();
-        int[] count = new int[26];
-        for(int i=0;i<26;i++)
-        {
-            count[i] =0;
+    public boolean isAchiveable(String id){
+        HashMap<Character,Integer> map=new HashMap<>();
+        for(int i=0;i<id.length();i++){
+            map.put(id.charAt(i),map.getOrDefault(id.charAt(i),0)+1);
+            if(map.get(id.charAt(i))==2) return true;
         }
-        for(char c : s.toCharArray())
-        {
-            count[(int)c-(int)'A']++;
-        }
-        char c_max = getCountChar(count);
-        int maxCount = count[(int)c_max-(int)'A'];
-        if(maxCount>(N+1)/2)
-            return "";
-        String res = "";
-        for(int i=0;i<N;i++)
-        {
-            res +=' ';
-        }
-        int ind =0;
-        while(maxCount>0)
-        {
-            res = res.substring(0,ind)+c_max+res.substring(ind+1);
-            ind = ind+2;
-            maxCount--;
-        }
-        count[(int)c_max-(int)'A'] = 0;
-        for(int i =0;i<26;i++)
-        {
-            while(count[i]>0)
-            {
-                ind=(ind>=N)?1:ind;
-                res = res.substring(0,ind)+(char)((int)'A'+i)+res.substring(ind+1);
-                ind+=2;
-                count[i]--;
-            }
-        }
-        return res;
+        return false;
     }
-    public boolean isNumberValid(String licenseId)
-    {
-        for(int i=0;i<licenseId.length()-1;i++)
-        {
-            if(licenseId.charAt(i)==licenseId.charAt(i+1)) return false;
+    public String makevalidId(String id){
+        char[]ch=id.toCharArray();
+        Arrays.sort(ch);
+        String validId="";
+        for(int i=0;i<ch.length;i++){
+            validId +=ch[i];
         }
-        return true;
-    }
-
-    public String getTradeLicenseId() {
-        return tradeLicenseId;
+        return validId;
     }
 }
